@@ -1,0 +1,52 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Document list</title>
+    <link rel="stylesheet" href="/public/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <script type="text/javascript" src="/public/node_modules/vue/dist/vue.min.js"></script>
+    <script type="text/javascript" src="/public/node_modules/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/public/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div id="body">
+    <div>
+        <button type="button" class="btn btn-primary" id="refresh" v-on:click="refresh">刷新</button>
+        <div class="list-group">
+            <a v-bind:href="i.url" class="list-group-item list-group-item-action" target="_blank" v-for="i in list">
+                {{ i.name }}
+            </a>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    const body = new Vue({
+        el: '#body',
+        data: {
+            list: [],
+        },
+        methods: {
+            refresh: function () {
+                get_docs(this);
+            },
+        }
+    });
+    get_docs(body);
+
+    function get_docs(obj) {
+        $('#refresh').attr('disabled', true);
+        $.get('/get_docs', function (data) {
+            var json = JSON.parse(data);
+            obj.list = [];
+            for (var i in json['ret']) {
+                var item = {
+                    name: json['ret'][i],
+                    url: `/docs/${json['ret'][i]}/index.html`
+                };
+                obj.list.push(item);
+            }
+            $('#refresh').attr('disabled', false);
+        });
+    }
+</script>
+</body>
+</html>
